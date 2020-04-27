@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/szMarginV"
+        android:orientation="horizontal">
+
+        <Switch
+            android:id="@+id/swUseHr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/szMarginV"
+            android:layout_marginEnd="@dimen/szMarginV"
+            android:layout_weight="1"
+            android:text="@string/str_use_hr" />
+
+        <Switch
+            android:id="@+id/swAutostart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/szMarginV"
+            android:layout_marginEnd="@dimen/szMarginV"
+            android:layout_weight="1"
+            android:text="@string/str_autostart" />
+
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/swHrDeviceType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/szMarginV"
+        android:layout_marginTop="@dimen/szMarginV"
+        android:layout_marginEnd="@dimen/szMarginV"
+        android:layout_marginBottom="@dimen/szMarginV"
+        android:checked="true"
+        android:showText="true"
+        android:text="@string/str_hr_dev_type"
+        android:textOff="BLE"
+        android:textOn="ANT+" />
+
+    <LinearLayout
+        android:id="@+id/llAnt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/llAntDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvAntDev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:duplicateParentState="true"
+                android:text="@string/str_ant_dev"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tvAntDevice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:duplicateParentState="true"
+                android:text="@string/str_empty" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSelectAnt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/szMargin"
+            android:layout_marginTop="@dimen/szMarginV"
+            android:layout_marginEnd="@dimen/szMargin"
+            android:layout_marginBottom="@dimen/szMarginV"
+            android:duplicateParentState="false"
+            android:enabled="false"
+            android:text="@string/str_ant_sel"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llBle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/llBleDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/tvBleDev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:duplicateParentState="true"
+                android:text="@string/str_ble_dev"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tvBleDevice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:duplicateParentState="true"
+                android:text="@string/str_empty"
+                android:visibility="visible" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSelectBle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/szMargin"
+            android:layout_marginTop="@dimen/szMarginV"
+            android:layout_marginEnd="@dimen/szMargin"
+            android:layout_marginBottom="@dimen/szMarginV"
+            android:duplicateParentState="false"
+            android:enabled="false"
+            android:text="@string/str_ble_sel"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llWristDevice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvWristDev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/str_wrist_dev" />
+
+        <TextView
+            android:id="@+id/tvWristDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/str_empty" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSelectWrist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/szMargin"
+        android:layout_marginTop="@dimen/szMarginV"
+        android:layout_marginEnd="@dimen/szMargin"
+        android:layout_marginBottom="@dimen/szMarginV"
+        android:enabled="true"
+        android:text="@string/str_wrist_sel" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1,2">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFFFFF">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/str_hr_data" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_dev_stat" />
+
+            <TextView
+                android:id="@+id/tvHrStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_hr" />
+
+            <TextView
+                android:id="@+id/tvHeartRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_time" />
+
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_dist" />
+
+            <TextView
+                android:id="@+id/tvDist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_empty" />
+        </TableRow>
+    </TableLayout>
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/szMargin"
+        android:layout_marginTop="@dimen/szMarginV"
+        android:layout_marginEnd="@dimen/szMargin"
+        android:enabled="true"
+        android:text="@string/str_start" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/szMarginV" />
+</LinearLayout>
