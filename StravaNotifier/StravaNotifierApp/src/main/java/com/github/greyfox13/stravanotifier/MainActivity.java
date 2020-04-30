@@ -482,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         swUseHr.setEnabled(false);
                         initDisplay();
                         bleWristDevice = bluetoothAdapter.getRemoteDevice(selectedWristDevice);
-                        bleWristGatt = bleWristDevice.connectGatt(this, false, bleGattCallback);
+                        bleWristGatt = bleWristDevice.connectGatt(this, true, bleGattCallback);
                         isStarted = true;
                         wristTimer = new Timer();
                     }

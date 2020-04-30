@@ -1,2 +1,2 @@
-include ':app'
+include ':StravaNotifierApp'
 rootProject.name='Strava Notifier'
