@@ -11,7 +11,7 @@
     <string name="str_wrist_dev">Wrist:</string>
     <string name="str_ant_sel">Select ANT+ device</string>
     <string name="str_ble_sel">Select BLE device</string>
-    <string name="str_wrist_sel">Select wrist</string>
+    <string name="str_wrist_sel">Select wristband</string>
     <string name="str_hr_data">HR data</string>
     <string name="str_ble_data">BLE data</string>
     <string name="str_dev_stat">Device status:</string>
