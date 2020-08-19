@@ -96,7 +96,7 @@ public class HrService extends Service
                     (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             bluetoothAdapter = bluetoothManager.getAdapter();
             bleHrDevice = bluetoothAdapter.getRemoteDevice(bleDeviceAddress);
-            bleGatt = bleHrDevice.connectGatt(this, true, bleGattCallback);
+            bleGatt = bleHrDevice.connectGatt(this, false, bleGattCallback);
         }
 
         return START_NOT_STICKY;

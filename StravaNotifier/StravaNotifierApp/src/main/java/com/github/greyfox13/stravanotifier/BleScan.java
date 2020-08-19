@@ -81,6 +81,7 @@ public class BleScan extends AppCompatActivity
                 Intent intent = new Intent();
                 intent.putExtra("hr_ble_device_name",listDevicesBle.get(pos).getName());
                 intent.putExtra("hr_ble_device_mac",listDevicesBle.get(pos).getAddress());
+                scanLeDevice(false);
                 setResult(RESULT_OK, intent);
                 finish();
             }

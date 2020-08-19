@@ -11,16 +11,28 @@ import android.util.Log;
 
 public class StravaNotifService extends NotificationListenerService
 {
+    StravaData stravaData;
+
+    public static class StravaData
+    {
+        public long dist = 0;
+        public long time = 0;
+        public boolean run = false;
+    }
+
     @Override
     public void onCreate()
     {
         super.onCreate();
+        stravaData = new StravaData();
+        Log.d("GFX", "Notif onCreate");
     }
 
     @Override
     public void onDestroy()
     {
-        super.onCreate();
+        Log.d("GFX", "Notif onDestroy");
+        super.onDestroy();
     }
 
     @Override
@@ -35,11 +47,12 @@ public class StravaNotifService extends NotificationListenerService
         String title, text;
         String time;
         String dist;
-        boolean isRun;
+        boolean isRun = false;
         int pos1, pos2;
         long time_i=0, dist_i=0;
         String units[];
         Message msg;
+        Log.d("GFX", "Notif onNotificationPosted");
 
         if(sbn.getPackageName().equals("com.strava"))
         {
@@ -65,24 +78,30 @@ public class StravaNotifService extends NotificationListenerService
                     }
                     dist = dist.replace(',', '.');
                     dist_i = (long) (Float.parseFloat(dist) * 1000);
-                    msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_TIME, 0, 0, time_i);
-                    MainActivity.mainHandler.sendMessage(msg);
-                    msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_DIST, 0, 0, dist_i);
-                    MainActivity.mainHandler.sendMessage(msg);
+                    //msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_TIME, 0, 0, time_i);
+                    //MainActivity.mainHandler.sendMessage(msg);
+                    //msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_DIST, 0, 0, dist_i);
+                    //MainActivity.mainHandler.sendMessage(msg);
                     if(text != null)
                     {
                         if (text.equals("Остановлено") || text.equals("Stopped"))
                             isRun = false;
                         else
                             isRun = true;
-                        msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_RECORD_STATUS, 0, 0, isRun);
-                        MainActivity.mainHandler.sendMessage(msg);
+                        //msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_RECORD_STATUS, 0, 0, isRun);
+                        //MainActivity.mainHandler.sendMessage(msg);
                     }
                     else
                     {
-                        msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_RECORD_STATUS, 0, 0, true);
-                        MainActivity.mainHandler.sendMessage(msg);
+                        isRun = true;
+                        //msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_RECORD_STATUS, 0, 0, true);
+                        //MainActivity.mainHandler.sendMessage(msg);
                     }
+                    stravaData.dist = dist_i;
+                    stravaData.time = time_i;
+                    stravaData.run = isRun;
+                    msg = MainActivity.mainHandler.obtainMessage(MainActivity.WRIST_SET_DATA, 0, 0, stravaData);
+                    MainActivity.mainHandler.sendMessage(msg);
                 }
             }
 

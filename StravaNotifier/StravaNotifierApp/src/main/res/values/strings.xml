@@ -8,7 +8,7 @@
     <string name="str_use_ble">Use BLE</string>
     <string name="str_ant_dev">ANT+ device:</string>
     <string name="str_ble_dev">BLE device:</string>
-    <string name="str_wrist_dev">Wrist:</string>
+    <string name="str_wrist_dev">Wristband:</string>
     <string name="str_ant_sel">Select ANT+ device</string>
     <string name="str_ble_sel">Select BLE device</string>
     <string name="str_wrist_sel">Select wristband</string>

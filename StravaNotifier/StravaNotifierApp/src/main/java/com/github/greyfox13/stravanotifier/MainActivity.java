@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     boolean permissionExtStorageGranted = false;
     boolean permissionLocationGranted = false;
     boolean isRecordRun = false;
+    boolean isRecordRunNew = false;
     static MyHandler mainHandler;
     NotificationManager nm;
     BluetoothAdapter bluetoothAdapter;
@@ -103,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     SharedPreferences sPref;
 
+    StravaNotifService.StravaData stravaData;
+
     private Timer wristTimer;
     private WristTimerTask wristTimerTask;
 
@@ -110,16 +113,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final static String WRIST_CHARACTERISTIC = "0000FF02-0000-1000-8000-00805F9B34FB";
 
     byte[] cmdSetCfg = {0x01, 0x07};
-    byte[] cmdSetData = {0x02, 0x00, 0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00};
+    byte[] cmdSetRun = {0x05, 0x01};
+    byte[] cmdSetData = {0x02, 0x00, 0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00, 0x00};
 
     //handler messages IDs
     final static int ANT_SET_STATUS = 0;
     final static int ANT_SET_HEARTRATE = 1;
     final static int BLE_SET_STATUS = 3;
     final static int BLE_SET_HEARTRATE_RR = 4;
-    final static int WRIST_SET_TIME = 5;
+    final static int WRIST_SET_DATA = 5;
     final static int WRIST_SET_DIST = 6;
     final static int WRIST_SET_RECORD_STATUS = 7;
+    final static int WRIST_SET_TIME = 8;
     //service notify id
     final static int SERVICE_NOTIFY_ID = 100;
     //access IDs
@@ -128,6 +133,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final static int REQUEST_ENABLE_BT = 12;
     final static int REQUEST_BLE_DEVICE = 13;
     final static int REQUEST_WRIST_DEVICE = 14;
+
+    public class StravaData1
+    {
+        public long dist;
+        public long time;
+        public boolean run;
+    }
 
     public static class MyHandler extends Handler
     {
@@ -147,6 +159,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void handleMessage(Message msg)
         {
             MainActivity activity = wrActivity.get();
+            int i=0;
+            boolean res=false;
             switch (msg.what)
             {
                 case ANT_SET_STATUS:
@@ -170,16 +184,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     activity.tvHeartRate.setText(String.valueOf(msg.arg1));
                     activity.heartrate = (byte)msg.arg1;
                     break;
-                case WRIST_SET_TIME:
-                    activity.tvTime.setText(timeConvert((long)msg.obj));
-                    activity.time = (long)msg.obj;
-                    break;
-                case WRIST_SET_DIST:
-                    activity.tvDist.setText(String.valueOf((long)msg.obj));
-                    activity.dist = (long)msg.obj;
-                    break;
-                case WRIST_SET_RECORD_STATUS:
-                    activity.isRecordRun = (boolean)msg.obj;
+                case WRIST_SET_DATA:
+                    activity.stravaData = (StravaNotifService.StravaData)msg.obj;
+                    activity.tvTime.setText(timeConvert(activity.stravaData.time));
+                    activity.time = activity.stravaData.time;
+                    activity.tvDist.setText(String.valueOf(activity.stravaData.dist));
+                    activity.dist = activity.stravaData.dist;
+                    if(activity.bleWristGatt!=null && activity.wristCharacteristic!=null && activity.isStarted)
+                    {
+                        activity.isRecordRun = activity.stravaData.run;
+                        activity.cmdSetData[1] = activity.heartrate;
+                        activity.cmdSetData[2] = (byte) (activity.dist >> 24);
+                        activity.cmdSetData[3] = (byte) (activity.dist >> 16);
+                        activity.cmdSetData[4] = (byte) (activity.dist >> 8);
+                        activity.cmdSetData[5] = (byte) activity.dist;
+                        activity.cmdSetData[6] = (byte) (activity.time >> 24);
+                        activity.cmdSetData[7] = (byte) (activity.time >> 16);
+                        activity.cmdSetData[8] = (byte) (activity.time >> 8);
+                        activity.cmdSetData[9] = (byte) activity.time;
+                        if(activity.stravaData.run) activity.cmdSetData[14] = 0x01;
+                            else activity.cmdSetData[14] = 0x02;
+                        activity.wristCharacteristic.setValue(activity.cmdSetData);
+                        while(!res && i<20)
+                        {
+                            res=activity.bleWristGatt.writeCharacteristic(activity.wristCharacteristic);
+                            if(!res)
+                            {
+                                try {
+                                    Thread.sleep(100);
+                                }catch (Exception e){
+                                    e.printStackTrace();}
+                            }
+                            i++;
+                            Log.d("GFX", "RUN = " + activity.stravaData.run + "; res = " + res + "; i = " + i);
+                        }
+                    }
                     break;
             }
             super.handleMessage(msg);
@@ -244,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnSelectWrist.setOnClickListener(this);
         btnStart.setOnClickListener(this);
 
+        stravaData = new StravaNotifService.StravaData();
         //Intent intent=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
         //startActivity(intent);
 
@@ -482,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         swUseHr.setEnabled(false);
                         initDisplay();
                         bleWristDevice = bluetoothAdapter.getRemoteDevice(selectedWristDevice);
-                        bleWristGatt = bleWristDevice.connectGatt(this, true, bleGattCallback);
+                        bleWristGatt = bleWristDevice.connectGatt(this, false, bleGattCallback);
                         isStarted = true;
                         wristTimer = new Timer();
                     }
@@ -520,7 +560,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
         switch (requestCode)
         {
             case REQUEST_PERMISSION_EXT_STORAGE:
@@ -545,6 +586,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
         }
     }
+
     protected AntPluginPcc.IPluginAccessResultReceiver<AntPlusHeartRatePcc> pluginAccessResultReceiver =
             new AntPluginPcc.IPluginAccessResultReceiver<AntPlusHeartRatePcc>()
             {
@@ -658,27 +700,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             pccReleaseHandle.close();
         }
+        if(bluetoothAdapter != null)
+        {
+            bluetoothAdapter = null;
+        }
     }
 
-    class WristTimerTask extends TimerTask {
+    class WristTimerTask extends TimerTask
+    {
 
         @Override
         public void run()
         {
-            if(isRecordRun)
-            {
-                cmdSetData[1] = heartrate;
-                cmdSetData[2] = (byte) (dist >> 24);
-                cmdSetData[3] = (byte) (dist >> 16);
-                cmdSetData[4] = (byte) (dist >> 8);
-                cmdSetData[5] = (byte) dist;
-                cmdSetData[6] = (byte) (time >> 24);
-                cmdSetData[7] = (byte) (time >> 16);
-                cmdSetData[8] = (byte) (time >> 8);
-                cmdSetData[9] = (byte) time;
-                wristCharacteristic.setValue(cmdSetData);
-                bleWristGatt.writeCharacteristic(wristCharacteristic);
-            }
+
         }
     }
 
@@ -693,10 +727,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else if(newState == BluetoothProfile.STATE_DISCONNECTED)
             {
-                if (wristTimerTask != null)
-                {
-                    wristTimerTask.cancel();
-                }
                 gatt.connect();
             }
         }
@@ -704,27 +734,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onCharacteristicWrite (BluetoothGatt gatt,BluetoothGattCharacteristic characteristic,int status)
         {
-            if((status != BluetoothGatt.GATT_SUCCESS) && (characteristic.getUuid().compareTo(UUID.fromString(WRIST_CHARACTERISTIC))==0))
+            Log.d("GFX", "onCharacteristicWrite: " + status);
+            /*if((status != BluetoothGatt.GATT_SUCCESS) && (characteristic.getUuid().compareTo(UUID.fromString(WRIST_CHARACTERISTIC))==0))
             {
                 characteristic.setValue(cmdSetCfg);
                 gatt.writeCharacteristic(characteristic);
-            }
+            }*/
         }
 
         @Override
         public void onDescriptorWrite (BluetoothGatt gatt,BluetoothGattDescriptor descriptor,int status)
         {
-            boolean res;
             if((status == BluetoothGatt.GATT_SUCCESS) && (descriptor.getUuid().compareTo(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG))==0))
             {
-                //gatt.setCharacteristicNotification(descriptor.getCharacteristic(), true);
-                //descriptor = wristCharacteristic.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
-                //descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                //gatt.writeDescriptor(descriptor);
                 wristCharacteristic.setValue(cmdSetCfg);
-                res=gatt.writeCharacteristic(wristCharacteristic);
-                wristTimerTask = new WristTimerTask();
-                wristTimer.schedule(wristTimerTask, 500, 1000);
+                gatt.writeCharacteristic(wristCharacteristic);
+                //wristTimerTask = new WristTimerTask();
+                //wristTimer.schedule(wristTimerTask, 500, 1000);
             }
         }
 
